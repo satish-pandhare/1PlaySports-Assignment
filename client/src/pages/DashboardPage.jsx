@@ -13,16 +13,16 @@ export default function DashboardPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetchTasks({ status: statusFilter || undefined, page: currentPage, limit: 10 });
+    fetchTasks({
+      status: statusFilter || undefined,
+      page: currentPage,
+      limit: 10,
+    });
   }, [fetchTasks, statusFilter, currentPage]);
 
   const handleFilterChange = (status) => {
     setStatusFilter(status);
     setCurrentPage(1);
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
   };
 
   const filters = [
@@ -33,42 +33,70 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-5 py-8">
-        {/* Simple header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <p className="text-gray-500 text-sm mb-1">Welcome back,</p>
-            <h1 className="text-gray-900 text-2xl font-medium">{user?.name}</h1>
+    <div className="min-h-screen bg-neutral-50">
+      {/* Header */}
+      <header className="bg-white border-b border-neutral-200">
+        <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-14">
+          {/* App Name */}
+          <span className="text-sm font-semibold text-neutral-900">
+            Task Manager
+          </span>
+
+          {/* User Section */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-neutral-600">{user?.name}</span>
+
+            <span className="text-neutral-300">|</span>
+
+            <button
+              id="logout-button"
+              onClick={logout}
+              className="text-sm text-neutral-500 hover:text-neutral-800 transition-colors"
+            >
+              Sign out
+            </button>
           </div>
-          <button
-            onClick={logout}
-            className="text-gray-500 text-sm hover:text-gray-700"
-          >
-            Sign out
-          </button>
         </div>
+      </header>
 
-        {/* Add task */}
-        <div className="mb-6">
+      {/* Main */}
+      <main className="max-w-[1200px] mx-auto px-8 pt-8 pb-12">
+        {/* Page header */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-lg font-medium text-neutral-800">Tasks</h1>
           <button
+            id="add-task-button"
             onClick={() => setShowForm(true)}
-            className="w-full text-left px-5 py-4 bg-white border-2 border-dashed border-gray-300 rounded-lg text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-all text-base"
+            className="inline-flex items-center gap-1.5 px-3.5 py-[7px] border border-neutral-300 text-neutral-700 text-sm rounded-md hover:bg-neutral-100 cursor-pointer"
           >
-            + Add a new task...
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Add task
           </button>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-2 mb-5">
+        {/* Tabs — underline style */}
+        <div className="flex gap-0 border-b border-neutral-200 mb-6">
           {filters.map((f) => (
             <button
               key={f.value}
+              id={`filter-${f.value || "all"}`}
               onClick={() => handleFilterChange(f.value)}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`px-4 pb-[10px] text-sm border-b-2 -mb-px cursor-pointer ${
                 statusFilter === f.value
-                  ? "bg-gray-900 text-white"
-                  : "text-gray-600 hover:bg-gray-100"
+                  ? "border-neutral-800 text-neutral-800 font-medium"
+                  : "border-transparent text-neutral-400 hover:text-neutral-600"
               }`}
             >
               {f.label}
@@ -76,19 +104,18 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Task Form Modal */}
         {showForm && <TaskForm onClose={() => setShowForm(false)} />}
 
-        {/* Error */}
         {error && (
-          <div className="mb-4 p-4 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
+          <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-md">
             {error}
           </div>
         )}
 
-        {/* Loading */}
         {loading ? (
-          <div className="py-20 text-center text-gray-400">Loading...</div>
+          <div className="py-20 flex justify-center">
+            <div className="w-4 h-4 border-2 border-neutral-200 border-t-neutral-500 rounded-full animate-spin"></div>
+          </div>
         ) : (
           <>
             <TaskList tasks={tasks} />
@@ -96,17 +123,21 @@ export default function DashboardPage() {
             <Pagination
               pagination={pagination}
               currentPage={currentPage}
-              onPageChange={handlePageChange}
+              onPageChange={setCurrentPage}
             />
 
             {tasks.length === 0 && (
               <div className="py-20 text-center">
-                <p className="text-gray-400 text-base">No tasks here</p>
+                <p className="text-sm text-neutral-400">
+                  {statusFilter
+                    ? "No tasks match this filter."
+                    : "No tasks yet. Create one to get started."}
+                </p>
               </div>
             )}
           </>
         )}
-      </div>
+      </main>
     </div>
   );
 }

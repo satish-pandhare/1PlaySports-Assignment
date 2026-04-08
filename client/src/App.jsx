@@ -9,16 +9,14 @@ function AppContent() {
   const { user, loading } = useAuth();
   const [authMode, setAuthMode] = useState("login");
 
-  // Show loading while checking auth
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  // Show auth pages if not logged in
   if (!user) {
     if (authMode === "register") {
       return <RegisterPage onSwitchToLogin={() => setAuthMode("login")} />;
@@ -26,7 +24,6 @@ function AppContent() {
     return <LoginPage onSwitchToRegister={() => setAuthMode("register")} />;
   }
 
-  // Show dashboard if logged in
   return (
     <TaskProvider>
       <DashboardPage />
