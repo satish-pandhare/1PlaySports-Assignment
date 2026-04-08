@@ -1,0 +1,55 @@
+// Prisma Schema for Task Manager Application
+// Design Choices:
+// 1. UUID for primary keys - better for distributed systems and doesn't expose record count
+// 2. User model with email as unique identifier for authentication
+// 3. Task status as enum - enforces valid values at database level
+// 4. Task has required userId foreign key - every task belongs to a user
+// 5. Soft delete not implemented for simplicity - can be added via deletedAt field if needed
+// 6. updatedAt auto-updates on any row change via @updatedAt directive
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Stored as bcrypt hash
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tasks Task[]
+
+  @@map("users")
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model Task {
+  id          String     @id @default(uuid())
+  title       String
+  description String?    // Optional field for task details
+  status      TaskStatus @default(TODO)
+  dueDate     DateTime?  // Optional due date
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("tasks")
+}
