@@ -4,7 +4,7 @@
   "description": "Task Manager REST API",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "npx prisma generate && node src/index.js",
     "dev": "nodemon src/index.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
